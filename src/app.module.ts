@@ -3,12 +3,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ExpenseModule } from './expense/expense.module';
 import { CategoryModule } from './category/category.module';
-import { UserModule } from './user/user.module';
+import { JwtModule } from "@nestjs/jwt";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env',
+    }),
+    JwtModule.register({
+      global: true,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -22,7 +25,6 @@ import { UserModule } from './user/user.module';
     }),
     ExpenseModule,
     CategoryModule,
-    UserModule,
   ],
 })
 export class AppModule {}

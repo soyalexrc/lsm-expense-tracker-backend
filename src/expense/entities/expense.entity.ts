@@ -20,6 +20,9 @@ export class Expense {
 
   @Prop()
   description: string;
+
+  @Prop()
+  userId: string;
 }
 
 export const ExpenseSchema = SchemaFactory.createForClass(Expense);

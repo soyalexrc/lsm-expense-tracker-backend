@@ -1,16 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { Expense } from './entities/expense.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UpdateCategoryDto } from "../category/dto/update-category.dto";
+import { clerkClient } from "@clerk/clerk-sdk-node";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class ExpenseService {
   private readonly logger: Logger;
   constructor(
     @InjectModel(Expense.name) private expenseModel: Model<Expense>,
+    private jwtService: JwtService,
   ) {}
   async create(createExpenseDto: CreateExpenseDto) {
     try {
@@ -21,9 +24,24 @@ export class ExpenseService {
     }
   }
 
-  async findAll(): Promise<Expense[]> {
+  async findAll(): Promise<any> {
     try {
-      return await this.expenseModel.find({}).populate('category');
+      const users = await clerkClient.users.getUserList();
+      return {
+        users,
+      };
+      // return await this.expenseModel.find({}).populate('category');
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+  async getByUserId(body: { token: string }): Promise<Expense[]> {
+    const userId = this.jwtService.decode(body.token)?.sub;
+    try {
+      return await this.expenseModel
+        .find({ userId: userId })
+        .sort({ date: 1 })
+        .populate('category');
     } catch (e) {
       this.logger.error(e);
     }
@@ -31,7 +49,7 @@ export class ExpenseService {
 
   async findOne(id: string) {
     try {
-      return await this.expenseModel.findById(id);
+      return await this.expenseModel.findById(id).populate('category');
     } catch (e) {
       this.logger.error(e);
     }

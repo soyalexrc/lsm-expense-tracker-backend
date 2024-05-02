@@ -11,6 +11,7 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ParseMongoIdPipe } from "../common/pipes/parse-mongo-id/parse-mongo-id.pipe";
+import { Auth } from "../common/decorators/auth.decorator";
 
 @Controller('category')
 export class CategoryController {
@@ -21,7 +22,8 @@ export class CategoryController {
     return this.categoryService.create(createCategoryDto);
   }
 
-  @Get()
+  @Post('GetAll')
+  // @Auth()
   findAll() {
     return this.categoryService.findAll();
   }
