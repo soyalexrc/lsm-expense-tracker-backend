@@ -42,10 +42,10 @@ export class ExpenseController {
     return this.expenseService.findOne(id);
   }
 
-  @Post('GetStats')
+  @Post('GetTotals')
   // @Auth()
-  getStats(@Body() data: FiltersDto) {
-    return this.expenseService.getStats(data);
+  getTotals(@Body() data: FiltersDto) {
+    return this.expenseService.getTotals(data);
   }
 
   @Patch(':id')

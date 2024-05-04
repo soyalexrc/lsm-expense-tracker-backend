@@ -52,7 +52,7 @@ export class ExpenseService {
     }
   }
 
-  async getStats(data: FiltersDto) {
+  async getTotals(data: FiltersDto) {
     const { userId, dateFrom, dateTo } = data;
     const match =
       dateFrom && dateTo
@@ -74,6 +74,7 @@ export class ExpenseService {
       const totalAmount = await this.expenseModel.aggregate([
         match,
         { $group: { _id: null, totalAmount: { $sum: '$amount' } } },
+        { $project: { totalAmount: { $round: ['$totalAmount', 2] } } },
       ]);
       const totalAmountByCategory = await this.expenseModel.aggregate([
         {
@@ -99,18 +100,44 @@ export class ExpenseService {
         },
         {
           $project: {
-            totalAmount: 1,
+            totalAmount: { $round: ['$totalAmount', 2] },
             _id: 0,
             category: { $arrayElemAt: ['$category', 0] }, // Get the first element from category array (category document)
           },
         },
       ]);
+      const totalAmountByDay = await this.expenseModel.aggregate([
+        {
+          $match: {
+            userId,
+            date: {
+              $gte: new Date(dateFrom),
+              $lte: new Date(dateTo),
+            },
+          },
+        },
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+            totalAmount: { $sum: '$amount' },
+          },
+        },
+        {
+          $project: {
+            date: '$_id',
+            _id: 0,
+            totalAmount: { $round: ['$totalAmount', 2] },
+          },
+        },
+        { $sort: { date: 1 } },
+      ]);
       return {
-        totalAmount: totalAmount[0].totalAmount,
+        totalAmount: totalAmount[0]?.totalAmount ?? 0,
         totalAmountByCategory,
+        totalAmountByDay,
       };
     } catch (e) {
-      this.logger.error(e);
+      this.logger.error('here', e);
     }
   }
 
