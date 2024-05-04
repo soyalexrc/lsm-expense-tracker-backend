@@ -4,9 +4,6 @@ export class CreateExpenseDto {
   @IsString()
   title: string;
 
-  @IsString()
-  token: string;
-
   // @IsDate()
   @IsString()
   date: Date;
