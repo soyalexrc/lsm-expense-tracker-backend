@@ -1,19 +1,17 @@
-import { Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { Expense } from './entities/expense.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UpdateCategoryDto } from "../category/dto/update-category.dto";
-import { clerkClient } from "@clerk/clerk-sdk-node";
-import { JwtService } from "@nestjs/jwt";
+import { clerkClient } from '@clerk/clerk-sdk-node';
+import { FiltersDto } from './dto/filters.dto';
 
 @Injectable()
 export class ExpenseService {
   private readonly logger: Logger;
   constructor(
     @InjectModel(Expense.name) private expenseModel: Model<Expense>,
-    private jwtService: JwtService,
   ) {}
   async create(createExpenseDto: CreateExpenseDto) {
     try {
@@ -35,12 +33,11 @@ export class ExpenseService {
       this.logger.error(e);
     }
   }
-  async getByUserId(body: { token: string }): Promise<Expense[]> {
-    const userId = this.jwtService.decode(body.token)?.sub;
+  async getByUserId(userId: string): Promise<Expense[]> {
     try {
       return await this.expenseModel
         .find({ userId: userId })
-        .sort({ date: 1 })
+        .sort({ date: -1 })
         .populate('category');
     } catch (e) {
       this.logger.error(e);
@@ -50,6 +47,69 @@ export class ExpenseService {
   async findOne(id: string) {
     try {
       return await this.expenseModel.findById(id).populate('category');
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  async getStats(data: FiltersDto) {
+    const { userId, dateFrom, dateTo } = data;
+    const match =
+      dateFrom && dateTo
+        ? {
+            $match: {
+              userId,
+              date: {
+                $gte: new Date(dateFrom),
+                $lte: new Date(dateTo),
+              },
+            },
+          }
+        : {
+            $match: {
+              userId,
+            },
+          };
+
+    try {
+      const totalAmount = await this.expenseModel.aggregate([
+        match,
+        { $group: { _id: null, totalAmount: { $sum: '$amount' } } },
+      ]);
+      const totalAmountByCategory = await this.expenseModel.aggregate([
+        {
+          $lookup: {
+            from: 'categories',
+            localField: 'category',
+            foreignField: '_id',
+            as: 'category',
+          },
+        },
+        match,
+        {
+          $group: {
+            _id: '$category._id',
+            totalAmount: { $sum: '$amount' },
+            category: { $first: '$category.title' },
+          },
+        },
+        {
+          $sort: {
+            category: 1,
+          },
+        },
+        {
+          $project: {
+            totalAmount: 1,
+            _id: 0,
+            category: { $arrayElemAt: ['$category', 0] }, // Get the first element from category array (category document)
+          },
+        },
+      ]);
+      return {
+        totalAmount: totalAmount[0].totalAmount,
+        totalAmountByCategory,
+      };
     } catch (e) {
       this.logger.error(e);
     }

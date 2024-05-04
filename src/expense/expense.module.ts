@@ -12,6 +12,6 @@ import { JwtUtilService } from '../common/services/jwt-util/jwt-util.service';
     MongooseModule.forFeature([{ name: Expense.name, schema: ExpenseSchema }]),
   ],
   controllers: [ExpenseController],
-  providers: [ExpenseService, JwtUtilService],
+  providers: [ExpenseService],
 })
 export class ExpenseModule {}

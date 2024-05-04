@@ -12,6 +12,7 @@ import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { ParseMongoIdPipe } from "../common/pipes/parse-mongo-id/parse-mongo-id.pipe";
 import { Auth } from "../common/decorators/auth.decorator";
+import { FiltersDto } from "./dto/filters.dto";
 
 @Controller('expense')
 export class ExpenseController {
@@ -29,14 +30,20 @@ export class ExpenseController {
 
   @Post('GetByUserId')
   // @Auth()
-  getByUserId(@Body() body: { token: string} ) {
-    return this.expenseService.getByUserId(body);
+  getByUserId(@Body() body: { userId: string} ) {
+    return this.expenseService.getByUserId(body.userId);
   }
 
   @Post('GetById/:id')
   // @Auth()
   findOne(@Param('id', ParseMongoIdPipe) id: string) {
     return this.expenseService.findOne(id);
+  }
+
+  @Post('GetStats')
+  // @Auth()
+  getStats(@Body() data: FiltersDto) {
+    return this.expenseService.getStats(data);
   }
 
   @Patch(':id')

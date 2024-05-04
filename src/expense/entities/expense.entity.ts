@@ -22,6 +22,9 @@ export class Expense {
   description: string;
 
   @Prop()
+  paymentMethod: string;
+
+  @Prop()
   userId: string;
 }
 

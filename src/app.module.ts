@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ExpenseModule } from './expense/expense.module';
 import { CategoryModule } from './category/category.module';
 import { JwtModule } from "@nestjs/jwt";
+import { UserSettingsModule } from './user-settings/user-settings.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { JwtModule } from "@nestjs/jwt";
     }),
     ExpenseModule,
     CategoryModule,
+    UserSettingsModule,
   ],
 })
 export class AppModule {}

@@ -21,7 +21,7 @@ export class CategoryService {
 
   async findAll() {
     try {
-      return await this.categoryModel.find({});
+      return await this.categoryModel.find({}).sort({ title: 1 });
     } catch (e) {
       console.log(e);
     }

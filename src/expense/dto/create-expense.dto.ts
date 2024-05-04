@@ -14,6 +14,9 @@ export class CreateExpenseDto {
   @IsString()
   description: string;
 
+  @IsString()
+  paymentMethod: string;
+
   @IsNumber()
   amount: number;
 
