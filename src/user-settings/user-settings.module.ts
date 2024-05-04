@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { UserSettingsService } from './user-settings.service';
 import { UserSettingsController } from './user-settings.controller';
-import { MongooseModule } from "@nestjs/mongoose";
-import { UserSetting, UserSettingSchema } from "./entities/user-setting.entity";
+import { MongooseModule } from '@nestjs/mongoose';
+import { UserSetting, UserSettingSchema } from './entities/user-setting.entity';
 
 @Module({
   imports: [

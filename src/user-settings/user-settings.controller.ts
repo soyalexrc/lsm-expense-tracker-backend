@@ -1,8 +1,16 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { UserSettingsService } from './user-settings.service';
 import { CreateUserSettingDto } from './dto/create-user-setting.dto';
 import { UpdateUserSettingDto } from './dto/update-user-setting.dto';
-import { ParseMongoIdPipe } from "../common/pipes/parse-mongo-id/parse-mongo-id.pipe";
+import { ParseMongoIdPipe } from '../common/pipes/parse-mongo-id/parse-mongo-id.pipe';
 
 @Controller('user-settings')
 export class UserSettingsController {
@@ -24,7 +32,10 @@ export class UserSettingsController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseMongoIdPipe) id: string, @Body() updateUserSettingDto: UpdateUserSettingDto) {
+  update(
+    @Param('id', ParseMongoIdPipe) id: string,
+    @Body() updateUserSettingDto: UpdateUserSettingDto,
+  ) {
     return this.userSettingsService.update(id, updateUserSettingDto);
   }
 

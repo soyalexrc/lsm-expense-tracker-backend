@@ -70,7 +70,6 @@ export class ExpenseService {
               userId,
             },
           };
-
     try {
       const totalAmount = await this.expenseModel.aggregate([
         match,

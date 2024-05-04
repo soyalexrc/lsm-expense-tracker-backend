@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ExpenseModule } from './expense/expense.module';
 import { CategoryModule } from './category/category.module';
-import { JwtModule } from "@nestjs/jwt";
+import { JwtModule } from '@nestjs/jwt';
 import { UserSettingsModule } from './user-settings/user-settings.module';
 
 @Module({
