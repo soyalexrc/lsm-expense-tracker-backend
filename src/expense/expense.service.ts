@@ -6,12 +6,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { clerkClient } from '@clerk/clerk-sdk-node';
 import { FiltersDto } from './dto/filters.dto';
+import { UserSetting } from '../user-settings/entities/user-setting.entity';
 
 @Injectable()
 export class ExpenseService {
   private readonly logger: Logger;
   constructor(
     @InjectModel(Expense.name) private expenseModel: Model<Expense>,
+    @InjectModel(UserSetting.name) private userSettingModel: Model<UserSetting>,
   ) {}
   async create(createExpenseDto: CreateExpenseDto) {
     try {
@@ -71,6 +73,7 @@ export class ExpenseService {
             },
           };
     try {
+      const settings = await this.userSettingModel.findOne({ userId });
       const totalAmount = await this.expenseModel.aggregate([
         match,
         { $group: { _id: null, totalAmount: { $sum: '$amount' } } },
@@ -91,6 +94,7 @@ export class ExpenseService {
             _id: '$category._id',
             value: { $sum: '$amount' },
             name: { $first: '$category.title' },
+            color: { $first: '$category.color' },
           },
         },
         {
@@ -102,6 +106,7 @@ export class ExpenseService {
           $project: {
             value: { $round: ['$value', 2] },
             _id: 0,
+            color: { $arrayElemAt: ['$color', 0] },
             name: { $arrayElemAt: ['$name', 0] }, // Get the first element from category array (category document)
           },
         },
@@ -131,10 +136,30 @@ export class ExpenseService {
         },
         { $sort: { date: 1 } },
       ]);
+      const totalByPaymentMethod = await this.expenseModel.aggregate([
+        match,
+        {
+          $group: {
+            _id: '$paymentMethod',
+            totalAmount: { $sum: '$amount' },
+          },
+        },
+        {
+          $project: {
+            totalAmount: { $round: ['$totalAmount', 2] },
+            _id: 1,
+          },
+        },
+      ]);
+      const totalAmountByPaymentMethod = this.mergePaymentData(
+        settings.paymentMethods,
+        totalByPaymentMethod,
+      );
       return {
         totalAmount: totalAmount[0]?.totalAmount ?? 0,
         totalAmountByCategory,
         totalAmountByDay,
+        totalAmountByPaymentMethod,
       };
     } catch (e) {
       this.logger.error('here', e);
@@ -179,5 +204,22 @@ export class ExpenseService {
     } catch (e) {
       console.log(e);
     }
+  }
+
+  private mergePaymentData(paymentMethods, totalByPaymentMethod) {
+    // Create a map for efficient lookup by _id
+    const totalMap: Map<string, number> = new Map();
+    for (const item of totalByPaymentMethod) {
+      totalMap.set(item._id, item.totalAmount);
+    }
+
+    // Merge payment methods with total amounts
+    const mergedData = [];
+    for (const method of paymentMethods) {
+      const totalAmount = totalMap.get(method._id); // Use 0 if no matching total is found
+      mergedData.push({ title: method.title, totalAmount });
+    }
+
+    return mergedData;
   }
 }

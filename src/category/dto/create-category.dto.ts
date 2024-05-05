@@ -6,4 +6,7 @@ export class CreateCategoryDto {
 
   @IsString()
   description: string;
+
+  @IsString()
+  color: string;
 }

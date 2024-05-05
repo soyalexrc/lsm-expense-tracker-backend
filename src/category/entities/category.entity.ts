@@ -10,6 +10,9 @@ export class Category {
 
   @Prop()
   description: string;
+
+  @Prop()
+  color: string;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
