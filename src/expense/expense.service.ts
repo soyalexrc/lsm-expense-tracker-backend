@@ -89,20 +89,20 @@ export class ExpenseService {
         {
           $group: {
             _id: '$category._id',
-            totalAmount: { $sum: '$amount' },
-            category: { $first: '$category.title' },
+            value: { $sum: '$amount' },
+            name: { $first: '$category.title' },
           },
         },
         {
           $sort: {
-            category: 1,
+            name: 1,
           },
         },
         {
           $project: {
-            totalAmount: { $round: ['$totalAmount', 2] },
+            value: { $round: ['$value', 2] },
             _id: 0,
-            category: { $arrayElemAt: ['$category', 0] }, // Get the first element from category array (category document)
+            name: { $arrayElemAt: ['$name', 0] }, // Get the first element from category array (category document)
           },
         },
       ]);
