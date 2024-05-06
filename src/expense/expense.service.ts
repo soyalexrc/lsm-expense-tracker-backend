@@ -35,10 +35,26 @@ export class ExpenseService {
       this.logger.error(e);
     }
   }
-  async getByUserId(userId: string): Promise<Expense[]> {
+  async getByUserId(filters: FiltersDto): Promise<Expense[]> {
+    const { userId, dateFrom, dateTo, categoryId, paymentMethod, title } = filters;
     try {
+      const query: any = { userId: userId };
+
+      // Add filters based on provided values
+      if (dateFrom && dateTo) {
+        query.date = { $gte: dateFrom, $lte: dateTo }; // Filter by date range
+      }
+      if (categoryId) {
+        query.category = categoryId; // Filter by category
+      }
+      if (paymentMethod) {
+        query.paymentMethod = paymentMethod; // Filter by payment method
+      }
+      if (title) {
+        query.title = { $regex: new RegExp(title, 'i') }; // Filter by title (case-insensitive)
+      }
       return await this.expenseModel
-        .find({ userId: userId })
+        .find(query)
         .sort({ date: -1 })
         .populate('category');
     } catch (e) {

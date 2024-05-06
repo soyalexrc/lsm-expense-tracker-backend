@@ -32,8 +32,8 @@ export class ExpenseController {
 
   @Post('GetByUserId')
   // @Auth()
-  getByUserId(@Body() body: { userId: string }) {
-    return this.expenseService.getByUserId(body.userId);
+  getByUserId(@Body() body: FiltersDto) {
+    return this.expenseService.getByUserId(body);
   }
 
   @Post('GetById/:id')

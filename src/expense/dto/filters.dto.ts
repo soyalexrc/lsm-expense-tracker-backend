@@ -7,6 +7,10 @@ export class FiltersDto {
 
   @IsString()
   @IsOptional()
+  title: string;
+
+  @IsString()
+  @IsOptional()
   expenseName: string;
 
   @IsString()
@@ -20,4 +24,9 @@ export class FiltersDto {
   @IsString()
   @IsOptional()
   dateTo: string;
+
+  @IsString()
+  @IsOptional()
+  paymentMethod: string;
+
 }
