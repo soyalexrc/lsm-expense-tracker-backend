@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  lsm_expense_tracker_backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lsm-expense-tracker-backend-docker
+    container_name: lsm_expense_tracker_backend
+    restart: always # reiniciar el contenedor si se detiene
+    ports:
+      - "${PORT}:${PORT}"
+    # working_dir: /var/www/pokedex
+    environment:
+      DB_NAME: ${DB_NAME}
+      MONGO_URI: ${MONGO_URI}
+      PORT: ${PORT}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+    # volumes:
+    #   - ./:/var/www/pokedex
