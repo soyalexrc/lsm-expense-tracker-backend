@@ -42,7 +42,7 @@ export class UserSettingsService {
         if (!paymentMethod._id) {
           return {
             ...paymentMethod,
-            _id: new mongoose.Types.ObjectId()._id,
+            _id: new mongoose.Types.ObjectId().toString(),
           };
         }
         return paymentMethod;

@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 
 export type UserSettingDocument = HydratedDocument<UserSetting>;
 
 export interface PaymentMethod {
   title: string;
-  _id: mongoose.Types.ObjectId;
+  _id: string;
 }
 
 @Schema()
