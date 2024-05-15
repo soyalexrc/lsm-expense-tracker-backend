@@ -168,7 +168,7 @@ export class ExpenseService {
         },
       ]);
       const totalAmountByPaymentMethod = this.mergePaymentData(
-        settings.paymentMethods,
+        settings?.paymentMethods,
         totalByPaymentMethod,
       );
       return {
@@ -232,7 +232,7 @@ export class ExpenseService {
     // Merge payment methods with total amounts
     const mergedData = [];
     for (const method of paymentMethods) {
-      const totalAmount = totalMap.get(method._id); // Use 0 if no matching total is found
+      const totalAmount = totalMap.get(method._id) || 0; // Use 0 if no matching total is found
       mergedData.push({ title: method.title, totalAmount });
     }
 
