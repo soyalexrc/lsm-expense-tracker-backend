@@ -36,7 +36,7 @@ export class ExpenseController {
     return this.expenseService.getByUserId(body);
   }
 
-  @Post('GetById/:id')
+  @Get('GetById/:id')
   // @Auth()
   findOne(@Param('id', ParseMongoIdPipe) id: string) {
     return this.expenseService.findOne(id);

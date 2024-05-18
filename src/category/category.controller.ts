@@ -22,7 +22,7 @@ export class CategoryController {
     return this.categoryService.create(createCategoryDto);
   }
 
-  @Post('GetAll')
+  @Get()
   // @Auth()
   findAll() {
     return this.categoryService.findAll();
